@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Network, LayoutDashboard, Sparkles } from "lucide-react";
+import { Network, Home, LayoutDashboard, Sparkles } from "lucide-react";
 import { DataSpineModal } from "@/components/DataSpineModal";
 
 const navLinks = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/finbuddy", label: "FinBuddy", icon: Sparkles },
 ];
 
