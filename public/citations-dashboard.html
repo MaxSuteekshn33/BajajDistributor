@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEBI / RBI / AMFI — Citations & References Dashboard</title>
+<style>
+  :root{
+    --navy:#0b1b2b;
+    --navy-2:#122a40;
+    --panel:#0f2338;
+    --panel-light:#14304a;
+    --border:#22415e;
+    --text:#e8f0f7;
+    --muted:#8fa8bd;
+    --teal:#2dd4bf;
+    --teal-dark:#0f766e;
+    --amber:#f5b942;
+    --violet:#a78bfa;
+    --sebi:#2dd4bf;
+    --rbi:#f5b942;
+    --amfi:#a78bfa;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Inter,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(45,212,191,0.08), transparent 40%),
+      radial-gradient(circle at 85% 10%, rgba(167,139,250,0.07), transparent 45%),
+      var(--navy);
+    color:var(--text);
+    min-height:100vh;
+  }
+  header{
+    padding:36px 40px 24px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    background:rgba(11,27,43,0.92);
+    backdrop-filter:blur(10px);
+    z-index:20;
+  }
+  .eyebrow{
+    color:var(--teal);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  h1{
+    margin:0 0 6px;
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:-0.3px;
+  }
+  header p.sub{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+    max-width:760px;
+    line-height:1.5;
+  }
+  .toolbar{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top:20px;
+  }
+  #search{
+    flex:1;
+    min-width:220px;
+    padding:11px 16px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--text);
+    font-size:14px;
+    outline:none;
+  }
+  #search::placeholder{color:var(--muted);}
+  #search:focus{border-color:var(--teal);}
+  .filter-btn{
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--muted);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .filter-btn:hover{border-color:var(--teal);color:var(--text);}
+  .filter-btn.active{
+    background:var(--teal);
+    border-color:var(--teal);
+    color:#062725;
+  }
+  main{
+    max-width:1280px;
+    margin:0 auto;
+    padding:32px 40px 80px;
+  }
+  .stats-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:36px;
+  }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .stat-card .num{
+    font-size:26px;
+    font-weight:800;
+    color:var(--teal);
+  }
+  .stat-card .label{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  section.block{margin-bottom:48px;}
+  .block-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:19px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .block-title .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--teal);
+  }
+  .block-desc{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:0 0 18px;
+    max-width:800px;
+    line-height:1.5;
+  }
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:linear-gradient(180deg, var(--panel-light), var(--panel));
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    border-color:var(--teal);
+  }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .card-issue{
+    font-size:14.5px;
+    font-weight:700;
+    line-height:1.35;
+  }
+  .tag{
+    flex-shrink:0;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    padding:4px 9px;
+    border-radius:999px;
+    text-transform:uppercase;
+  }
+  .tag.sebi{background:rgba(45,212,191,0.15);color:var(--sebi);border:1px solid rgba(45,212,191,0.4);}
+  .tag.rbi{background:rgba(245,185,66,0.15);color:var(--rbi);border:1px solid rgba(245,185,66,0.4);}
+  .tag.amfi{background:rgba(167,139,250,0.15);color:var(--amfi);border:1px solid rgba(167,139,250,0.4);}
+  .tag.mixed{background:rgba(255,255,255,0.08);color:var(--text);border:1px solid var(--border);}
+  .card-solution{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.55;
+  }
+  .card-solution b{color:var(--text);font-weight:600;}
+  .card-source{
+    font-size:12px;
+    color:var(--text);
+    background:rgba(255,255,255,0.04);
+    border-left:3px solid var(--teal);
+    padding:8px 12px;
+    border-radius:6px;
+    line-height:1.45;
+  }
+  .card-source .label-mini{
+    display:block;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:3px;
+  }
+  /* Bibliography list */
+  .biblio-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .biblio-item{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 18px;
+  }
+  .biblio-num{
+    flex-shrink:0;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--teal);
+    color:#062725;
+    font-weight:800;
+    font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .biblio-text{font-size:13.5px;line-height:1.5;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    padding:20px 40px 40px;
+  }
+  .hidden{display:none !important;}
+  .empty-state{
+    grid-column:1/-1;
+    text-align:center;
+    color:var(--muted);
+    padding:40px 0;
+    font-size:14px;
+  }
+  @media (max-width:720px){
+    header,main{padding-left:20px;padding-right:20px;}
+    .stats-row{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Regulatory Compliance Reference</div>
+  <h1>Citations & References — SEBI / RBI / AMFI</h1>
+  <p class="sub">Mapping of AI-advisory, distribution, and execution-only business scenarios to the applicable SEBI, RBI, and AMFI regulatory sources — for the Bajaj Finserv AMC case study.</p>
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="Search issues, solutions, or regulations…">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="sebi">SEBI</button>
+    <button class="filter-btn" data-filter="rbi">RBI</button>
+    <button class="filter-btn" data-filter="amfi">AMFI</button>
+  </div>
+</header>
+
+<main>
+  <div class="stats-row">
+    <div class="stat-card"><div class="num" id="stat-total">0</div><div class="label">Total Entries</div></div>
+    <div class="stat-card"><div class="num" id="stat-sebi">0</div><div class="label">SEBI Refs</div></div>
+    <div class="stat-card"><div class="num" id="stat-rbi">0</div><div class="label">RBI Refs</div></div>
+    <div class="stat-card"><div class="num" id="stat-amfi">0</div><div class="label">AMFI Refs</div></div>
+  </div>
+
+  <section class="block">
+    <div class="block-title"><span class="dot"></span>Issue / Business Opportunity → Regulatory Solution</div>
+    <p class="block-desc">Core mapping table: each business scenario paired with its permissible structure and the primary regulation governing it.</p>
+    <div class="card-grid" id="grid-issues"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-title"><span class="dot" style="background:var(--amber)"></span>Recent Regulatory Developments</div>
+    <p class="block-desc">Developments directly relevant to the AI-advisory / execution-only platform case.</p>
+    <div class="card-grid" id="grid-developments"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-title"><span class="dot" style="background:var(--violet)"></span>Merger & Acquisition Use Cases <span style="color:var(--muted);font-weight:400;font-size:14px;">(e.g., Groww)</span></div>
+    <p class="block-desc">Permissible structures for adding regulated capabilities via acquisition. <b style="color:var(--text)">Note:</b> an acquisition does not automatically transfer regulatory permissions — the acquired entity keeps operating under its own SEBI registration.</p>
+    <div class="card-grid" id="grid-ma"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-title"><span class="dot" style="background:#fff"></span>Primary Official References — Bibliography</div>
+    <p class="block-desc">Cite these directly in the appendix.</p>
+    <div class="biblio-list" id="biblio-list"></div>
+  </section>
+</main>
+
+<footer>Compiled from "Citations and References — SEBI/RBI" source document.</footer>
+
+<script>
+const REG = { SEBI:'sebi', RBI:'rbi', AMFI:'amfi' };
+
+function detectTags(str){
+  const tags = new Set();
+  if(/sebi/i.test(str)) tags.add('sebi');
+  if(/rbi/i.test(str)) tags.add('rbi');
+  if(/amfi/i.test(str)) tags.add('amfi');
+  return tags.size ? [...tags] : ['sebi'];
+}
+
+const issues = [
+  {issue:"AI platform provides personalized investment recommendations", solution:"Separate AI analytics from regulated advice. AI provides educational insights only; personalized recommendations are given only through a licensed RIA or permitted distributor.", source:"SEBI (Investment Advisers) Regulations, 2013 — Definition of \"Investment Advice\", registration requirements, fiduciary obligations, suitability, client risk profiling, code of conduct."},
+  {issue:"AMC wants to provide advisory services directly", solution:"Create a separate SEBI Registered Investment Adviser (RIA) subsidiary or acquire an existing RIA instead of mixing advisory with AMC operations.", source:"SEBI (Investment Advisers) Regulations, 2013 — Registration and segregation requirements."},
+  {issue:"Distributor begins offering financial planning beyond mutual funds", solution:"Distributor must obtain SEBI RIA registration if providing independent investment advice across securities or charging advisory fees.", source:"SEBI (Investment Advisers) Regulations, 2013."},
+  {issue:"Conflict between advisory and commission-based distribution", solution:"Maintain separate advisory and distribution businesses, separate clients, and conflict-of-interest controls.", source:"SEBI IA Regulations (2020 amendments incorporated into consolidated regulations) — Segregation of advisory and distribution."},
+  {issue:"AI-powered direct investment platform", solution:"Operate as an Execution-Only Platform (EOP) without giving investment advice. Platform only executes investor instructions for Direct Plans.", source:"SEBI Circular SEBI/HO/IMD/IMD-PoD-1/P/CIR/2023/86 — Regulatory Framework for Execution-Only Platforms (13 June 2023)."},
+  {issue:"Bajaj Finserv AMC wants a Groww-like Direct platform", solution:"Build or partner with a Category-1 or Category-2 EOP under SEBI's framework while keeping advisory separate.", source:"SEBI EOP Circular (2023) + AMFI EOP Guidelines."},
+  {issue:"AI portfolio tracking and health score", solution:"Keep AI outputs informational (performance analytics, asset allocation visualization, alerts). Escalate personalized recommendations to licensed advisers.", source:"Supported by SEBI IA Regulations (avoid crossing into regulated advice)."},
+  {issue:"Banks want to distribute mutual funds", solution:"Banks may distribute mutual funds after complying with RBI approval requirements and applicable SEBI/AMFI norms.", source:"RBI guidelines permitting banks to undertake mutual fund business and applicable SEBI Mutual Fund framework."},
+  {issue:"NBFCs want to distribute mutual funds", solution:"NBFCs may distribute mutual funds subject to Board-approved policy, suitability, KYC and SEBI code of conduct.", source:"RBI Master Directions for NBFCs undertaking Mutual Fund Distribution."},
+  {issue:"Digital onboarding of investors", solution:"Mandatory KYC, AML, Customer Due Diligence and PAN verification before transactions.", source:"RBI Master Direction — Know Your Customer (KYC) and SEBI KRA framework."},
+  {issue:"AMC onboarding distributors", solution:"Use ARN-based empanelment, due diligence, code of conduct and disclosure requirements.", source:"AMFI Distributor Guidelines, AMFI Master Circular, SEBI Distributor Due Diligence Circular."},
+  {issue:"Distributor recommends unsuitable products", solution:"Record investor acknowledgement if execution proceeds despite suitability concerns (\"Execution Only\").", source:"SEBI Circular on distributor due diligence and execution-only transactions (2011)."},
+  {issue:"Online investment platform pools investor money before sending to AMC", solution:"Avoid pooling of investor funds. Integrate directly with AMC/RTA infrastructure.", source:"SEBI Circular dated 4 October 2021 discontinuing pooling of funds by online platforms."},
+  {issue:"Fintech wants advisory capability without building from scratch", solution:"Acquire a SEBI-registered RIA or wealth-management entity. Advisory continues through the regulated subsidiary after regulatory approvals for change in control, where applicable.", source:"SEBI IA Regulations governing registered entities; acquisition does not automatically extend advisory rights across the group."},
+  {issue:"Bajaj Finserv AMC wants to launch AI advisory", solution:"Structure: AI analytics (AMC) + RIA subsidiary (advice) + EOP (execution). Keeps regulatory functions separated.", source:"Combination of SEBI IA Regulations + SEBI EOP Framework."},
+  {issue:"Human adviser supported by AI", solution:"AI generates insights, but final recommendation is delivered by licensed adviser after suitability assessment.", source:"SEBI IA Regulations — fiduciary duty, suitability and client profiling."},
+  {issue:"Client risk profiling before recommendations", solution:"Digital risk assessment questionnaire before advice generation.", source:"SEBI IA Regulations — suitability and risk profiling obligations."},
+  {issue:"Charging advisory fee while earning distributor commission", solution:"Do not combine fee-based advisory and commission-based distribution for the same advisory relationship.", source:"SEBI IA Regulations (segregation principles)."},
+  {issue:"Investors use Direct Plans", solution:"Direct Plans should be executed via EOP without embedded commission.", source:"SEBI EOP Circular (2023)."},
+];
+
+const developments = [
+  {issue:"Execution-Only Platform framework (2023)", solution:"Enables AI-led execution without providing regulated advice. Ideal for Bajaj Direct platform.", source:"SEBI Circular dated 13 June 2023."},
+  {issue:"AMFI EOP Guidelines", solution:"Defines Category-1 and Category-2 EOP operating models.", source:"AMFI Guidelines."},
+  {issue:"SEBI Master Circular for Investment Advisers (2026)", solution:"Consolidates all applicable IA regulations for compliance reference.", source:"SEBI Master Circular (2026)."},
+  {issue:"SEBI working group reviewing Mutual Fund Distributor framework", solution:"Indicates possible future alignment between MFDs and RIAs, making AI-enabled distribution a timely theme.", source:"SEBI working group report."},
+  {issue:"SEBI Mutual Fund Master Circular (2026)", solution:"Consolidated operating framework for mutual funds and AMCs.", source:"SEBI Mutual Fund Master Circular (2026)."},
+];
+
+const ma = [
+  {issue:"Add investment advisory capability", solution:"Acquire a SEBI-registered RIA.", source:"SEBI IA Regulations."},
+  {issue:"Add mutual fund distribution", solution:"Acquire or operate through an AMFI ARN-registered distributor.", source:"AMFI Distributor Guidelines."},
+  {issue:"Add execution capability", solution:"Register or partner as an EOP.", source:"SEBI EOP Circular (2023)."},
+  {issue:"Add stock broking", solution:"Acquire a SEBI-registered stock broker.", source:"SEBI intermediary registration framework."},
+  {issue:"Add PMS services", solution:"Acquire a SEBI-registered Portfolio Management Services entity.", source:"SEBI PMS Regulations."},
+];
+
+const biblio = [
+  "SEBI (Investment Advisers) Regulations, 2013 (Consolidated)",
+  "SEBI Regulatory Framework for Execution-Only Platforms (13 June 2023)",
+  "SEBI Framework for Administration and Supervision of Investment Advisers",
+  "SEBI Master Circulars (Mutual Funds & Investment Advisers)",
+  "SEBI Circular on Discontinuation of Pool Accounts by Online Platforms (4 Oct 2021)",
+  "AMFI Guidelines for Execution-Only Platforms",
+  "AMFI Circulars for Mutual Fund Distributors",
+  "RBI Master Directions for NBFCs Undertaking Mutual Fund Distribution / KYC Requirements",
+  "SEBI Circular on Due Diligence by AMCs for Mutual Fund Distributors (Execution-Only & Suitability)",
+];
+
+function tagLabel(t){ return t.toUpperCase(); }
+
+function renderCard(item){
+  const tags = detectTags(item.source);
+  const tagHtml = tags.length > 1
+    ? `<span class="tag mixed">${tags.map(tagLabel).join(' + ')}</span>`
+    : `<span class="tag ${tags[0]}">${tagLabel(tags[0])}</span>`;
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.tags = tags.join(',');
+  el.dataset.search = (item.issue + ' ' + item.solution + ' ' + item.source).toLowerCase();
+  el.innerHTML = `
+    <div class="card-top">
+      <div class="card-issue">${item.issue}</div>
+      ${tagHtml}
+    </div>
+    <div class="card-solution"><b>Solution:</b> ${item.solution}</div>
+    <div class="card-source"><span class="label-mini">Regulatory Source</span>${item.source}</div>
+  `;
+  return el;
+}
+
+function renderGrid(containerId, data){
+  const grid = document.getElementById(containerId);
+  data.forEach(item => grid.appendChild(renderCard(item)));
+}
+
+renderGrid('grid-issues', issues);
+renderGrid('grid-developments', developments);
+renderGrid('grid-ma', ma);
+
+const biblioList = document.getElementById('biblio-list');
+biblio.forEach((text, i) => {
+  const el = document.createElement('div');
+  el.className = 'biblio-item';
+  el.innerHTML = `<div class="biblio-num">${i+1}</div><div class="biblio-text">${text}</div>`;
+  biblioList.appendChild(el);
+});
+
+const allData = [...issues, ...developments, ...ma];
+const allTags = allData.map(i => detectTags(i.source)).flat();
+document.getElementById('stat-total').textContent = allData.length;
+document.getElementById('stat-sebi').textContent = allTags.filter(t=>t==='sebi').length;
+document.getElementById('stat-rbi').textContent = allTags.filter(t=>t==='rbi').length;
+document.getElementById('stat-amfi').textContent = allTags.filter(t=>t==='amfi').length;
+
+const searchInput = document.getElementById('search');
+const filterBtns = document.querySelectorAll('.filter-btn');
+let activeFilter = 'all';
+
+function applyFilters(){
+  const query = searchInput.value.trim().toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const matchesFilter = activeFilter === 'all' || card.dataset.tags.split(',').includes(activeFilter);
+    const matchesSearch = !query || card.dataset.search.includes(query);
+    card.classList.toggle('hidden', !(matchesFilter && matchesSearch));
+  });
+  document.querySelectorAll('.card-grid').forEach(grid => {
+    const visible = [...grid.children].filter(c => !c.classList.contains('hidden'));
+    let empty = grid.querySelector('.empty-state');
+    if(visible.length === 0){
+      if(!empty){
+        empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'No matching entries.';
+        grid.appendChild(empty);
+      }
+    } else if(empty){
+      empty.remove();
+    }
+  });
+}
+
+searchInput.addEventListener('input', applyFilters);
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+</script>
+
+</body>
+</html>
